@@ -1,7 +1,9 @@
 #include <unistd.h>
 #include "tcp_syn_monitor.h"
 
-int main(){
+int
+main()
+{
 	struct circular_buffer buffer;
 	init_circular_buffer(&buffer);
 
@@ -13,16 +15,21 @@ int main(){
 	printf("pcap thread started\n");
 	printf("press any key to stop\n");
 	printf("ISP number:\t");
-	for(int i = 0; i < ISP_NUMBER; i++){
+
+	for (int i = 0; i < ISP_NUMBER; i++) {
 		printf("ISP%d\t", i);
 	}
+
 	printf("\n");
-	while(1){
+
+	while (1) {
 		sleep(1);
 		printf("ISP count:\t");
-		for(int i = 0; i < ISP_NUMBER; i++){
+
+		for (int i = 0; i < ISP_NUMBER; i++) {
 			printf("%d\t", buffer.isp_count[i]);
 		}
+
 		printf("\n");
 	}
 
