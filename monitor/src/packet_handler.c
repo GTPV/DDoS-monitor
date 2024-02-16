@@ -11,7 +11,7 @@ determine_isp(char *ip_address)
 	char* idx = ip_address;
 	while (*idx != '\0') {
 		if(*idx >= '0' && *idx <= '9')
-			sum = sum + (sum * (*idx - '0')) + (*idx - '0');
+			sum += *idx - '0';
 		idx++;
 	}
 	return sum%10; // dummy return value
