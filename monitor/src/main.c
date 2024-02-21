@@ -1,64 +1,67 @@
+/* Created by shyang */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
-#include "tcp_syn_monitor.h"
+#include <arpa/inet.h>
+#include <sys/socket.h>
 
-// Normal traffic of each ISP
-int ISP_NORMAL_TRAFFIC[ISP_NUMBER] = { 100, 100, 100, 100, 100, 100, 100, 100, 100, 100 };
+#include "puzzle.h"
+#include "detect_ddos.h"
 
-void
-set_difficulty(int isp_id, int current, int normal)
-{
-	// TODO: implement this function - set the difficulty of the ISP
-	//         according to the ISP_NORMAL_TRAFFIC and the current traffic
-}
+int main(int argc, char* argv[]) {
+    int monitor_sock;
+    char msg[BUF_SIZE];
+    socklen_t auth_adr_sz;
+    struct sockaddr_in auth_adr, monitor_adr;
 
-void
-handle_ddos(cb_ptr buffer)
-{
-	for (int i = 0; i < ISP_NUMBER; i++) {
-		int current_traffic = get_circular_buffer_isp_count(buffer, i);
-		set_difficulty(i, current_traffic, ISP_NORMAL_TRAFFIC[i]);
-	}
-}
+    if (argc != 3) 
+    {
+        printf("Usage : %s <monitor ip> <monitor port>\n", argv[0]);
+        exit(1);
+    }
+    
+    // Create and bind monitor server UDP socket
+    monitor_sock = socket(PF_INET, SOCK_DGRAM, 0);
+    if (monitor_sock == -1) 
+    {
+        printf("UDP socket creation error");
+        exit(1);
+    }
+    printf("Create monitor server UDP socket\n");
+    memset(&monitor_adr, 0, sizeof(monitor_adr));
+    monitor_adr.sin_family = AF_INET;
+    monitor_adr.sin_addr.s_addr = inet_addr(argv[1]);
+    monitor_adr.sin_port = htons(atoi(argv[2]));
+    if (bind(monitor_sock, (struct sockaddr*)&monitor_adr, sizeof(monitor_adr)) == -1) 
+    {
+        printf("bind() error");
+        exit(1);
+    }
+    printf("Bind monitor server UDP socket\n");
 
-int
-main()
-{
-	const int DDOS_THRESHOLD = 1000;
-	struct circular_buffer buffer;
-	init_circular_buffer(&buffer);
+    // Start tcp syn monitoring thread
+    pthread_t tid;
+    start_detect_ddos_thread(&tid);
 
-	pcap_thread_data data;
-	init_pcap_thread(&data, &buffer);
 
-	start_pcap_thread(&data);
+    while (1) {
+        auth_adr_sz = sizeof(auth_adr);
+        recvfrom(monitor_sock, (void*)&cmsg, sizeof(cmsg), 0, (struct sockaddr*)&auth_adr, &auth_adr_sz);
+        printf("Receive message from auth server\n");
+        struct chain_msg cmsg;
+        cmsg.seed = rand();
+        cmsg.length = MAX_CHAIN_LENGTH; // TODO
+        cmsg.threshold = syscall(453, ipmsg.ip_num); // TODO
+        sendto(monitor_sock, (void*)&cmsg, sizeof(cmsg), 0, (struct sockaddr*)&auth_adr, auth_adr_sz);
+        printf("Send puzzle record to auth server\n");
+    }
 
-	printf("pcap thread started\n");
-	printf("press any key to stop\n");
-	printf("ISP number:\t");
+    stop_detect_ddos_thread(&tid);
 
-	for (int i = 0; i < ISP_NUMBER; i++) {
-		printf("ISP%d\t", i);
-	}
+    // Close socket
+    close(monitor_sock);
 
-	printf("\n");
-
-	while (1) {
-		sleep(1);
-		printf("ISP count:\t");
-
-		if (get_circular_buffer_size(&buffer) > DDOS_THRESHOLD) {
-			printf("DDOS detected\n");
-			handle_ddos(&buffer);
-		}
-
-		for (int i = 0; i < ISP_NUMBER; i++) {
-			printf("%d\t", get_circular_buffer_isp_count(&buffer, i));
-		}
-
-		printf("\n");
-	}
-
-	stop_pcap_thread(&data);
-
-	return 0;
+    return 0;
 }
