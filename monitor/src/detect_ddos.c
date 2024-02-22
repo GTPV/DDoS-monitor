@@ -3,7 +3,7 @@
 
 // Normal traffic of each ISP
 int ISP_NORMAL_TRAFFIC[ISP_NUMBER] = { 100, 100, 100, 100, 100, 100, 100, 100, 100, 100 };
-unsigned int DIFFICULTY[10] = {2147483647, };
+unsigned int DIFFICULTY[16] = {6000000, 3000000, 1500000, 1000000, 500000, 210000, 110000, 55000, 30000, 20000, 6500, 3500, 2500, 2000, 1500, 1000};
 
 void
 set_difficulty(int isp_id, int current)
@@ -16,6 +16,9 @@ set_difficulty(int isp_id, int current)
 	while (tmp <= current) {
 		tmp *= 2;
 		rise++;
+		if (rise == 16) {
+			break;
+		}
 	}
 
 	unsigned int puzzle_threshold = DIFFICULTY[rise];
