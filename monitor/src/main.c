@@ -48,7 +48,8 @@ int main(int argc, char* argv[]) {
 
     while (1) {
         auth_adr_sz = sizeof(auth_adr);
-        recvfrom(monitor_sock, (void*)&cmsg, sizeof(cmsg), 0, (struct sockaddr*)&auth_adr, &auth_adr_sz);
+	struct ip_msg ipmsg;
+        recvfrom(monitor_sock, (void*)&ipmsg, sizeof(ipmsg), 0, (struct sockaddr*)&auth_adr, &auth_adr_sz);
         printf("Receive message from auth server\n");
         struct chain_msg cmsg;
         cmsg.seed = rand();
