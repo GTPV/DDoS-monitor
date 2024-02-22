@@ -6,7 +6,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3")
 # Enable CMAKE_EXPORT_COMPILE_COMMANDS
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-project(tcp_syn_monitor)
+project(monitoring_server)
 
 # Add the include directory
 include_directories(include)
