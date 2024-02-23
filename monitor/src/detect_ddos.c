@@ -93,9 +93,17 @@ detect_ddos(void)
 
 	printf("\n");
 
+	FILE *tcp_count_logfile = fopen("tcp_count_log.tsv", "w");
+	if (tcp_count_logfile == NULL) {
+		printf("Error opening file!\n");
+		return 1;
+	}
+
+	struct timeval t;
 	while (1) {
-		sleep(1);
-		printf("ISP count:\t");
+		usleep(100000);
+		gettimeofday(&t, NULL);
+		fprintf(tcp_count_logfile, "%ld.%03d\t", t.tv_sec, t.tv_usec / 1000);
 
 		if (get_circular_buffer_size(&buffer) > DDOS_THRESHOLD) {
 			printf("DDOS detected\n");
@@ -103,11 +111,16 @@ detect_ddos(void)
 		}
 
 		for (int i = 0; i < ISP_NUMBER; i++) {
-			printf("%d\t", get_circular_buffer_isp_count(&buffer, i));
+			fprintf(tcp_count_logfile, "%d\t", get_circular_buffer_isp_count(&buffer, i));
 		}
 
 		printf("\n");
+
+		fflush(tcp_count_logfile);
+		fflush(stdout);
 	}
+
+	fclose(tcp_count_logfile);
 
 	stop_pcap_thread(&data);
 
