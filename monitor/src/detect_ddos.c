@@ -130,11 +130,17 @@ detect_ddos(void)
 void
 start_detect_ddos_thread(pthread_t *tid)
 {
-	pthread_create(tid, NULL, (void*)detect_ddos, NULL);
+	int ret = pthread_create(tid, NULL, (void*)detect_ddos, NULL);
+	if (ret) {
+		fprintf(stderr, "Error: detect ddos pthread_create() failed: (%d)\n", ret);
+	}
 }
 
 void
 stop_detect_ddos_thread(pthread_t *tid)
 {
-	pthread_join(*tid, NULL);
+	int ret = pthread_join(*tid, NULL);
+	if (ret) {
+		fprintf(stderr, "Error: detect ddos pthread_join() failed: (%d)\n", ret);
+	}
 }

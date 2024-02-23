@@ -40,12 +40,18 @@ init_pcap_thread(pcap_thread_data *data, cb_ptr buffer)
 void
 start_pcap_thread(pcap_thread_data *data)
 {
-	pthread_create(&data->tid, NULL, pcap_thread, (void*)data);
+	int ret = pthread_create(&data->tid, NULL, pcap_thread, (void*)data);
+	if (ret) {
+		fprintf(stderr, "Error: pcap pthread_create failed: (%d)\n", ret);
+	}
 }
 
 void
 stop_pcap_thread(pcap_thread_data *data)
 {
 	data->keep_running = false;
-	pthread_join(data->tid, NULL);
+	int ret = pthread_join(data->tid, NULL);
+	if (ret) {
+		fprintf(stderr, "Error: pcap pthread_join failed: (%d)\n", ret);
+	}
 }
