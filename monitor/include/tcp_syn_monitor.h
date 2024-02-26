@@ -18,6 +18,7 @@ typedef struct {
 	cb_ptr buffer;
 } pcap_thread_data;
 
+void *pcap_thread(void *data);
 int init_pcap_thread(pcap_thread_data *data, cb_ptr buffer);
 void start_pcap_thread(pcap_thread_data *data);
 void stop_pcap_thread(pcap_thread_data *data);
