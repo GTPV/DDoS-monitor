@@ -14,6 +14,14 @@ log_thread(void* arg)
 		return NULL;
 	}
 
+	fprintf(tcp_count_logfile, "ISP number:\t");
+
+	for (int i = 0; i < ISP_NUMBER; i++) {
+		fprintf(tcp_count_logfile, ",ISP%d\t", i);
+	}
+
+	fprintf(tcp_count_logfile, "\n");
+
 	struct timeval t;
 	while (1) {
 		usleep(100000);
@@ -22,9 +30,11 @@ log_thread(void* arg)
 		fprintf(stdout, "%ld.%03d\t", t.tv_sec, t.tv_usec / 1000);
 
 		for (int i = 0; i < ISP_NUMBER; i++) {
-			fprintf(tcp_count_logfile, "%d\t", get_circular_buffer_isp_count(buffer, i));
-			fprintf(stdout, "%d\t", get_circular_buffer_isp_count(buffer, i));
+			fprintf(tcp_count_logfile, ",%d\t", get_circular_buffer_isp_count(buffer, i));
+			fprintf(stdout, ",%d\t", get_circular_buffer_isp_count(buffer, i));
 		}
+		fprintf(tcp_count_logfile, "\n");
+		fprintf(stdout, "\n");
 
 		fflush(tcp_count_logfile);
 		fflush(stdout);

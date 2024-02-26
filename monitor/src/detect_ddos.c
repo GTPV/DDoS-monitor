@@ -75,7 +75,7 @@ handle_ddos(cb_ptr buffer)
 int
 detect_ddos(void)
 {
-	const int DDOS_THRESHOLD = 1000;
+	const int DDOS_THRESHOLD = 100;
 	struct circular_buffer buffer;
 	init_circular_buffer(&buffer);
 
@@ -89,7 +89,7 @@ detect_ddos(void)
 	printf("ISP number:\t");
 
 	for (int i = 0; i < ISP_NUMBER; i++) {
-		printf("ISP%d\t", i);
+		printf(",ISP%d\t", i);
 	}
 
 	printf("\n");
@@ -104,9 +104,6 @@ detect_ddos(void)
 			//handle_ddos(&buffer);
 		}
 
-		printf("\n");
-
-		fflush(stdout);
 	}
 
 	stop_log_thread(&log_data);
