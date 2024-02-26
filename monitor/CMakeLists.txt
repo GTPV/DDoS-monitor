@@ -12,7 +12,7 @@ project(monitoring_server)
 include_directories(include)
 
 # Update source files with the new path
-set(SOURCE_FILES src/main.c src/detect_ddos.c src/tcp_syn_monitor.c src/circular_buffer.c src/packet_handler.c)
+set(SOURCE_FILES src/main.c src/detect_ddos.c src/tcp_syn_monitor.c src/circular_buffer.c src/packet_handler.c src/monitor_log.c)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
