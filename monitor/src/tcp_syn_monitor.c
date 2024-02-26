@@ -3,7 +3,7 @@
 void*
 pcap_thread(void* arg)
 {
-	pcap_thread_data* data = (pcap_thread_data*)arg;
+	pcap_thread_data *data = (pcap_thread_data*)arg;
 	while (data->keep_running) {
 		pcap_dispatch(data->handle, -1, packet_handler, (u_char*)data->buffer);
 		/*if(pcap_get_selectable_fd(data->handle) != -1 && !data->keep_running){

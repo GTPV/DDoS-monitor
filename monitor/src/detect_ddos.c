@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include "tcp_syn_monitor.h"
+#include "monitor_log.h"
 
 // Normal traffic of each ISP
 int ISP_NORMAL_TRAFFIC[ISP_NUMBER] = { 100, 100, 100, 100, 100, 100, 100, 100, 100, 100 };
@@ -78,10 +79,10 @@ detect_ddos(void)
 	struct circular_buffer buffer;
 	init_circular_buffer(&buffer);
 
-	pcap_thread_data data;
-	init_pcap_thread(&data, &buffer);
+	pcap_thread_data pcap_data;
+	init_pcap_thread(&pcap_data, &buffer);
 
-	start_pcap_thread(&data);
+	start_pcap_thread(&pcap_data);
 
 	printf("pcap thread started\n");
 	printf("press any key to stop\n");
@@ -93,36 +94,24 @@ detect_ddos(void)
 
 	printf("\n");
 
-	FILE *tcp_count_logfile = fopen("tcp_count_log.tsv", "w");
-	if (tcp_count_logfile == NULL) {
-		printf("Error opening file!\n");
-		return 1;
-	}
+	log_thread_data log_data;
+	log_data.buffer = &buffer;
+	start_log_thread(&log_data);
 
-	struct timeval t;
 	while (1) {
-		usleep(100000);
-		gettimeofday(&t, NULL);
-		fprintf(tcp_count_logfile, "%ld.%03d\t", t.tv_sec, t.tv_usec / 1000);
-
 		if (get_circular_buffer_size(&buffer) > DDOS_THRESHOLD) {
 			printf("DDOS detected\n");
-			handle_ddos(&buffer);
-		}
-
-		for (int i = 0; i < ISP_NUMBER; i++) {
-			fprintf(tcp_count_logfile, "%d\t", get_circular_buffer_isp_count(&buffer, i));
+			//handle_ddos(&buffer);
 		}
 
 		printf("\n");
 
-		fflush(tcp_count_logfile);
 		fflush(stdout);
 	}
 
-	fclose(tcp_count_logfile);
+	stop_log_thread(&log_data);
 
-	stop_pcap_thread(&data);
+	stop_pcap_thread(&pcap_data);
 
 	return 0;
 }
