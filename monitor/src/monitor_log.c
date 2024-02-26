@@ -8,7 +8,7 @@ log_thread(void* arg)
 {
 	log_thread_data *data = (log_thread_data*)arg;
 	cb_ptr buffer = data->buffer;
-	FILE *tcp_count_logfile = fopen("tcp_count_log.tsv", "w");
+	FILE *tcp_count_logfile = fopen("tcp_count_log.csv", "w");
 	if (tcp_count_logfile == NULL) {
 		printf("Error opening file!\n");
 		return NULL;
