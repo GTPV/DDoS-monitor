@@ -48,13 +48,14 @@ int main(int argc, char* argv[]) {
 
     while (1) {
         auth_adr_sz = sizeof(auth_adr);
-	struct ip_msg ipmsg;
-        recvfrom(monitor_sock, (void*)&ipmsg, sizeof(ipmsg), 0, (struct sockaddr*)&auth_adr, &auth_adr_sz);
+	struct ip_msg dipmsg;
+        recvfrom(monitor_sock, (void*)&dipmsg, sizeof(dipmsg), 0, (struct sockaddr*)&auth_adr, &auth_adr_sz);
         printf("Receive message from auth server\n");
         struct chain_msg cmsg;
         cmsg.seed = rand();
         cmsg.length = MAX_CHAIN_LENGTH; // TODO
-        cmsg.threshold = syscall(453, ipmsg.ip_num); // TODO
+        cmsg.type = syscall(460);
+        cmsg.threshold = syscall(458, dipmsg.ip_num); // TODO
         sendto(monitor_sock, (void*)&cmsg, sizeof(cmsg), 0, (struct sockaddr*)&auth_adr, auth_adr_sz);
         printf("Send puzzle record to auth server\n");
     }
