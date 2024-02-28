@@ -10,14 +10,14 @@ log_thread(void* arg)
 	cb_ptr buffer = data->buffer;
 	FILE *tcp_count_logfile = fopen("tcp_count_log.csv", "w");
 	if (tcp_count_logfile == NULL) {
-		printf("Error opening file!\n");
+		fprintf(stderr, "Error opening file!\n");
 		return NULL;
 	}
 
-	fprintf(tcp_count_logfile, "ISP number:\t");
+	fprintf(tcp_count_logfile, "UNIX Time");
 
 	for (int i = 0; i < ISP_NUMBER; i++) {
-		fprintf(tcp_count_logfile, ",ISP%d\t", i);
+		fprintf(tcp_count_logfile, ",ISP%d", i);
 	}
 
 	fprintf(tcp_count_logfile, "\n");
@@ -26,11 +26,11 @@ log_thread(void* arg)
 	while (1) {
 		usleep(100000);
 		gettimeofday(&t, NULL);
-		fprintf(tcp_count_logfile, "%ld.%03d\t", t.tv_sec, t.tv_usec / 1000);
+		fprintf(tcp_count_logfile, "%ld.%03d", t.tv_sec, t.tv_usec / 1000);
 		fprintf(stdout, "%ld.%03d\t", t.tv_sec, t.tv_usec / 1000);
 
 		for (int i = 0; i < ISP_NUMBER; i++) {
-			fprintf(tcp_count_logfile, ",%d\t", get_circular_buffer_isp_count(buffer, i));
+			fprintf(tcp_count_logfile, ",%d", get_circular_buffer_isp_count(buffer, i));
 			fprintf(stdout, ",%d\t", get_circular_buffer_isp_count(buffer, i));
 		}
 		fprintf(tcp_count_logfile, "\n");
